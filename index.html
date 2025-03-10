@@ -21,7 +21,7 @@
         // Initialisation de la carte
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v12', // Style de la carte
+            style: 'mapbox://styles/bibliovernaculaire/cm83bsejw000h01sefj93d1u7', // Style de la carte
             center: [2.3522, 48.8566], // Coordonnées de Paris
             zoom: 3
         });
@@ -33,16 +33,26 @@
             { name: "Projet 3", coords: [13.405, 52.52], url: "projet3.html" }
         ];
 
-        // Ajout des marqueurs sur la carte
-        points.forEach(point => {
+         // Ajout des marqueurs et événements de survol
+         points.forEach(point => {
+            const popup = new mapboxgl.Popup({ closeButton: false, offset: 10 }).setText(point.name);
             const marker = new mapboxgl.Marker()
                 .setLngLat(point.coords)
-                .setPopup(new mapboxgl.Popup().setHTML(`<h3>${point.name}</h3>`)) // Infobulle
                 .addTo(map);
 
-            // Ajout d'un événement au clic sur le marqueur
+            // Affiche le popup au survol
+            marker.getElement().addEventListener('mouseenter', () => {
+                popup.setLngLat(point.coords).addTo(map);
+            });
+
+            // Masque le popup quand la souris quitte le marqueur
+            marker.getElement().addEventListener('mouseleave', () => {
+                popup.remove();
+            });
+
+            // Ajout d'un clic pour ouvrir la page du projet
             marker.getElement().addEventListener('click', () => {
-                window.location.href = point.url; // Redirige vers la page du projet
+                window.location.href = point.url;
             });
         });
     </script>
