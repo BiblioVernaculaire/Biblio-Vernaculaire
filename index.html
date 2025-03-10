@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblio Vernaculaire</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; }
+        #map { width: 100%; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        // Clé d'API Mapbox (remplace par la tienne)
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYmlibGlvdmVybmFjdWxhaXJlIiwiYSI6ImNtODNiaDc2MDA0NGIyb3I0cTd4bXdmN3IifQ.ZMJRLLBtSc6pEhXXSvrMQA';
+
+        // Initialisation de la carte
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12', // Style de la carte
+            center: [2.3522, 48.8566], // Coordonnées de Paris
+            zoom: 3
+        });
+
+        // Données des points (projets architecturaux)
+        const points = [
+            { name: "Projet 1", coords: [2.3522, 48.8566], url: "projet1.html" },
+            { name: "Projet 2", coords: [-0.1278, 51.5074], url: "projet2.html" },
+            { name: "Projet 3", coords: [13.405, 52.52], url: "projet3.html" }
+        ];
+
+        // Ajout des marqueurs sur la carte
+        points.forEach(point => {
+            const marker = new mapboxgl.Marker()
+                .setLngLat(point.coords)
+                .setPopup(new mapboxgl.Popup().setHTML(`<h3>${point.name}</h3>`)) // Infobulle
+                .addTo(map);
+
+            // Ajout d'un événement au clic sur le marqueur
+            marker.getElement().addEventListener('click', () => {
+                window.location.href = point.url; // Redirige vers la page du projet
+            });
+        });
+    </script>
+</body>
+</html>
