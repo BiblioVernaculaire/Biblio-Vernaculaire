@@ -94,27 +94,39 @@
             zoom: 2
         });
 
-        const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
+        const climateGroups = {
+            polaire: ['ET', 'EF'],
+            tropical: ['Af', 'Am', 'Aw', 'As'],
+            aride: ['BWh', ' BWk', 'BSh', 'BSk'],
+            tempere: ['Cfa', 'Cfb', 'Cfc', 'Csa', 'Csb', 'Csc', 'Cwa', 'Cwb', 'Cwc'],
+            continental: ['Dfa', 'Dfb', 'Dfc', 'Dfd', 'Dsa', 'Dsb', 'Dsc', 'Dsd', 'Dwa', 'Dwb', 'Dwc', 'Dwd']
+        };
 
         // Charge le GeoJSON
         map.on('load', function() {
         // Charge ton GeoJSON avec les zones climatiques
         map.addSource('climates', {
             type: 'geojson',
-            data: 'climats.geojson' // Remplace avec le chemin de ton fichier GeoJSON
+            data: '1976-2000.geojson'
         });
 
-        // Ajoute une couche pour chaque climat (exemple pour tropical et arid)
-        climates.forEach(climate => {
+        // Ajoute une couche pour chaque climat
+        Object.keys(climateGroups).forEach(climate => {
             map.addLayer({
             id: `climate-${climate}`,
             type: 'fill',
             source: 'climates',
             paint: {
-                'fill-color': climate === 'tropical' ? '#ff0000' : climate === 'aride' ? '#ff9900' : '#00ff00',
+                'fill-color': {
+                    tropical: '#5c965e',
+                    aride: '#deba14',
+                    tempere: '#c96767',
+                    continental: '#8d5c96',
+                    polaire: '#9ddbda'
+                }[climate], // Associe la couleur correcte
                 'fill-opacity': 0.5
             },
-            filter: ['==', ['get', 'climate'], climate] // Applique un filtre pour chaque climat
+            filter: ['in', ['get', 'CODE'], ...climateGroups[climate]] // Filtre par groupe de climat
             });
 
             // Cache la couche initialement
@@ -189,11 +201,9 @@
             // Cache toutes les couches
             climates.forEach(climate => {
                 map.setLayoutProperty(`climate-${climate}`, 'visibility', 'none');
-                console.log(climate);
             });
             // Affiche uniquement la couche du climat sélectionné
-            map.setLayoutProperty(`climate-${selectedClimate}`, 'visibility', 'visible');
-            console.log(selectedClimate);            
+            map.setLayoutProperty(`climate-${selectedClimate}`, 'visibility', 'visible');      
         }}
 
         // Ajouter les événements pour mettre à jour les projets affichés
