@@ -128,8 +128,6 @@
                         },
                         filter: ['==', ['get', 'CODE'], code]  // 🔥 Filtre sur chaque code spécifique
                     });
-
-                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'none'); // Masquer par défaut
                 });
             });
         });
