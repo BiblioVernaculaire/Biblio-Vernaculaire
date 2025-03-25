@@ -213,9 +213,12 @@
                 // Afficher seulement la zone sélectionnée
                 map.setLayoutProperty('climate-zones', 'visibility', 'visible');
                 map.setLayoutProperty('climate-borders', 'visibility', 'visible');
-                map.setFilter('climate-zones', ['==', ['get', 'climate'], selectedClimate]);
-                map.setFilter('climate-borders', ['==', ['get', 'climate'], selectedClimate]);
-                console.log("Climat sélectionné :", selectedClimate);
+                // Appliquer le filtre après un court délai pour s'assurer que la carte soit prête
+                setTimeout(() => {
+                    map.setFilter('climate-zones', ['==', ['get', 'climate'], selectedClimate]);
+                    map.setFilter('climate-borders', ['==', ['get', 'climate'], selectedClimate]);
+                }, 100);
+                console.log("Le climat sélectionné :", selectedClimate);
             }
         });
     </script>
