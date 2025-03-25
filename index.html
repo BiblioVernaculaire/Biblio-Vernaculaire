@@ -104,35 +104,35 @@
 
         // Charge le GeoJSON
         map.on('load', function() {
-        // Charge ton GeoJSON avec les zones climatiques
-        map.addSource('climates', {
-            type: 'geojson',
-            data: '1976-2000.geojson'
-        });
-
-        // Ajoute une couche pour chaque climat
-        Object.keys(climateGroups).forEach(climate => {
-            map.addLayer({
-            id: `climate-${climate}`,
-            type: 'fill',
-            source: 'climates',
-            paint: {
-                'fill-color': {
-                    tropical: '#5c965e',
-                    aride: '#deba14',
-                    tempere: '#c96767',
-                    continental: '#8d5c96',
-                    polaire: '#9ddbda'
-                }[climate], // Associe la couleur correcte
-                'fill-opacity': 0.5
-            },
-            filter: ['in', ['get', 'CODE'], ...climateGroups[climate]] // Filtre par groupe de climat
+            // Charge ton GeoJSON avec les zones climatiques
+            map.addSource('climates', {
+                type: 'geojson',
+                data: '1976-2000.geojson'
             });
 
-            // Cache la couche initialement
-            map.setLayoutProperty(`climate-${climate}`, 'visibility', 'none');
-        })
-        });        
+            Object.entries(climateGroups).forEach(([climate, codes]) => {
+                codes.forEach(code => {  // 🔥 On crée une couche pour chaque code de climat
+                    map.addLayer({
+                        id: `climate-${code}`,  // ✅ L'ID est basé sur le code de climat (ET, EF...)
+                        type: 'fill',
+                        source: 'climates',
+                        paint: {
+                            'fill-color': {
+                                polaire: '#9ddbda',
+                                tropical: '#5c965e',
+                                aride: '#deba14',
+                                tempere: '#c96767',
+                                continental: '#8d5c96'
+                            }[climate], // 🎨 Associe la bonne couleur
+                            'fill-opacity': 0.5
+                        },
+                        filter: ['==', ['get', 'CODE'], code]  // 🔥 Filtre sur chaque code spécifique
+                    });
+
+                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'none'); // Masquer par défaut
+                });
+            });
+        });
 
         // Liste des projets
         const projects = [
