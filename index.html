@@ -52,6 +52,7 @@
 
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYmlibGlvdmVybmFjdWxhaXJlIiwiYSI6ImNtODNiaDc2MDA0NGIyb3I0cTd4bXdmN3IifQ.ZMJRLLBtSc6pEhXXSvrMQA';
+        const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
 
         // Liste élargie de centres sur chaque continent
         const continentCenters = [
@@ -101,10 +102,7 @@
             type: 'geojson',
             data: 'climats.geojson' // Remplace avec le chemin de ton fichier GeoJSON
         });
-
-        // Ajoute une couche pour chaque climat (exemple pour tropical et arid)
-        const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
-
+            
         climates.forEach(climate => {
             map.addLayer({
             id: `climate-${climate}`,
