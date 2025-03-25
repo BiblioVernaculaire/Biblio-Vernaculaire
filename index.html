@@ -131,7 +131,6 @@
         function updateProjects() {
             const selectedClimate = document.getElementById("climateFilter").value;
             const selectedMaterial = document.getElementById("materialFilter").value;
-            const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
 
             // Filtrer les projets selon la sélection
             const filteredProjects = projects.filter(proj => 
@@ -177,7 +176,8 @@
 
                 projectList.appendChild(projectItem);
             });
-
+            
+            const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
             // Si "all" est sélectionné, on cache toutes les couches
             if (selectedClimate === "all") {
             // Cache toutes les couches
