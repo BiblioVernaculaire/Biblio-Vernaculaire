@@ -208,12 +208,14 @@
                 // Cacher toutes les zones
                 map.setLayoutProperty('climate-zones', 'visibility', 'none');
                 map.setLayoutProperty('climate-borders', 'visibility', 'none');
+                console.log("Climat sélectionné :", selectedClimate);
             } else {
                 // Afficher seulement la zone sélectionnée
                 map.setLayoutProperty('climate-zones', 'visibility', 'visible');
                 map.setLayoutProperty('climate-borders', 'visibility', 'visible');
                 map.setFilter('climate-zones', ['==', ['get', 'climate'], selectedClimate]);
                 map.setFilter('climate-borders', ['==', ['get', 'climate'], selectedClimate]);
+                console.log("Climat sélectionné :", selectedClimate);
             }
         });
     </script>
