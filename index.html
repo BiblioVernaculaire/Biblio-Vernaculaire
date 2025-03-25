@@ -128,6 +128,8 @@
                         },
                         filter: ['==', ['get', 'CODE'], code]  // 🔥 Filtre sur chaque code spécifique
                     });
+
+                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'none'); // Masquer par défaut
                 });
             });
         });
@@ -192,17 +194,20 @@
             // Si "all" est sélectionné, on cache toutes les couches
             if (selectedClimate === "all") {
             // Cache toutes les couches
-            climates.forEach(climate => {
-                map.setLayoutProperty(`climate-${climate}`, 'visibility', 'none');
+            Object.values(climateGroups).flat().forEach(code => {
+                map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
             });
             } else {
-            // Cache toutes les couches
-            climates.forEach(climate => {
-                map.setLayoutProperty(`climate-${climate}`, 'visibility', 'none');
-            });
-            // Affiche uniquement la couche du climat sélectionné
-            map.setLayoutProperty(`climate-${selectedClimate}`, 'visibility', 'visible');      
-        }}
+                // Cache toutes les couches
+                Object.values(climateGroups).flat().forEach(code => {
+                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
+                });
+                // Affiche uniquement la couche du climat sélectionné
+                if (climateGroups[selectedClimate]) { 
+                    climateGroups[selectedClimate].forEach(code => {
+                        map.setLayoutProperty(`climate-${code}`, 'visibility', 'visible');      
+                    });  
+                }}
 
         // Ajouter les événements pour mettre à jour les projets affichés
         document.getElementById("climateFilter").addEventListener("change", updateProjects);
