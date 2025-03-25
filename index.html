@@ -101,7 +101,8 @@
             type: 'geojson',
             data: 'climats.geojson' // Remplace avec le chemin de ton fichier GeoJSON
         });
-            
+
+        // Ajoute une couche pour chaque climat (exemple pour tropical et arid)
         climates.forEach(climate => {
             map.addLayer({
             id: `climate-${climate}`,
@@ -187,9 +188,11 @@
             // Cache toutes les couches
             climates.forEach(climate => {
                 map.setLayoutProperty(`climate-${climate}`, 'visibility', 'none');
+                console.log(climate);
             });
             // Affiche uniquement la couche du climat sélectionné
             map.setLayoutProperty(`climate-${selectedClimate}`, 'visibility', 'visible');
+            console.log(selectedClimate);            
         }}
 
         // Ajouter les événements pour mettre à jour les projets affichés
