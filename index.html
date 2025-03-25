@@ -94,6 +94,8 @@
             zoom: 2
         });
 
+        const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
+
         // Charge le GeoJSON
         map.on('load', function() {
         // Charge ton GeoJSON avec les zones climatiques
@@ -177,7 +179,6 @@
                 projectList.appendChild(projectItem);
             });
             
-            const climates = ['tropical', 'aride', 'tempere', 'continental', 'polaire']; // Liste des climats dans ton fichier GeoJSON
             // Si "all" est sélectionné, on cache toutes les couches
             if (selectedClimate === "all") {
             // Cache toutes les couches
