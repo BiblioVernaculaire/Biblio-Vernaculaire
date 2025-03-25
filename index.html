@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblio Vernaculairex</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+    <!-- MENU LATÉRAL -->
+    <div id="menu">
+        <h1>Bibliothèque Vernaculaire</h1>
+        <p>Explorez les projets architecturaux traditionnels à travers le monde.</p>
+        <div id="filters">
+            <label for="climateFilter">Climat :</label>
+            <select id="climateFilter">
+                <option value="all">Tous</option>
+                <option value="tropical">Tropical</option>
+                <option value="aride">Aride</option>
+                <option value="tempere">Tempéré</option>
+                <option value="continental">Continental</option>
+            </select>
+        
+            <label for="materialFilter">Matériau :</label>
+            <select id="materialFilter">
+                <option value="all">Tous</option>
+                <option value="bois">Bois</option>
+                <option value="pierre">Pierre</option>
+                <option value="terre">Terre</option>
+                <option value="brique">Brique</option>
+                <option value="metal">Métal</option>
+            </select>
+        </div>
+        <h2>Projets :</h2>
+        <div id="project-list"></div>
+    </div>
+
+    <!-- CARTE -->
+    <div id="map"></div>
+
+    <!-- Popup projet -->
+    <div id="popup-container">
+        <div id="popup-content">
+            <span id="close-popup">&times;</span>
+            <iframe id="popup-iframe" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYmlibGlvdmVybmFjdWxhaXJlIiwiYSI6ImNtODNiaDc2MDA0NGIyb3I0cTd4bXdmN3IifQ.ZMJRLLBtSc6pEhXXSvrMQA';
+
+        // Liste élargie de centres sur chaque continent
+        const continentCenters = [
+            // 🌍 Afrique
+            [23, -1], [10, 20], [30, -10], [0, 5], [35, 15],
+
+            // 🌎 Amérique du Nord
+            [-100, 40], [-80, 25], [-120, 50], [-90, 60], [-110, 35],
+
+            // 🌎 Amérique du Sud
+            [-60, -15], [-70, -30], [-55, 0], [-80, -10], [-50, -20],
+
+            // 🌏 Asie
+            [100, 35], [80, 50], [120, 20], [90, 10], [110, 40],
+
+            // 🌍 Europe
+            [10, 50], [-5, 45], [20, 55], [30, 60], [0, 65],
+
+            // 🌏 Océanie
+            [135, -25], [150, -30], [140, -20], [130, -15], [160, -35]
+        ];
+
+        // Sélectionner un point aléatoire dans la liste
+        const randomCenter = continentCenters[Math.floor(Math.random() * continentCenters.length)];
+
+        // Ajouter une variation aléatoire autour du point sélectionné
+        const variationLng = (Math.random() - 0.5) * 20; // Décalage longitude (-5 à +5)
+        const variationLat = (Math.random() - 0.5) * 15;  // Décalage latitude (-2.5 à +2.5)
+
+        const finalCenter = [
+            randomCenter[0] + variationLng, 
+            randomCenter[1] + variationLat
+        ];
+
+        // Initialisation de la carte
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/bibliovernaculaire/cm83bsejw000h01sefj93d1u7', // Ton style Mapbox
+            center: finalCenter, // Coordonnées initiales
+            zoom: 2
+        });
+
+        map.on('load', function () {
+            // Charger la source des climats
+            map.addSource('climates', {
+                type: 'geojson',
+                data: 'climats.geojson'
+            });
+
+            // Ajouter la couche des zones climatiques avec des couleurs
+            map.addLayer({
+                id: 'climate-zones',
+                type: 'fill',
+                source: 'climates',
+                paint: {
+                    'fill-color': [
+                        'match',
+                        ['get', 'climate'],
+                        'Tropical', '#ffcc00',  // Jaune
+                        'Aride', '#ff6600',     // Orange
+                       'Tempere', '#66ccff',   // Bleu clair
+                        'Continental', '#3399ff', // Bleu foncé
+                        'Polaire', '#ccccff',   // Blanc-bleu
+                        '#ffffff' // Couleur par défaut
+                    ],
+                    'fill-opacity': 0.4
+                }
+                layout: {
+                    'visibility': 'none'  // Cache les zones climatiques au début
+                }
+            });
+
+            // Ajouter une bordure aux zones climatiques
+            map.addLayer({
+                id: 'climate-borders',
+                type: 'line',
+                source: 'climates',
+                paint: {
+                    'line-color': '#000',
+                    'line-width': 1
+                }
+            });
+        });
+
+        // Liste des projets
+        const projects = [
+            { name: "Piichi/Miichi et Lu'uma", coords: [-71.7164, 12.0725], url: "projet1.html", climate: "tempere", material: "bois"},
+            { name: "Londres", coords: [-0.1278, 51.5074], url: "projet2.html", climate: "aride", material: "terre"},
+            { name: "Berlin", coords: [13.405, 52.52], url: "projet3.html", climate: "aride", material: "bois"}
+        ];
+
+        // Fonction pour afficher les projets filtrés
+        function updateProjects() {
+            const selectedClimate = document.getElementById("climateFilter").value;
+            const selectedMaterial = document.getElementById("materialFilter").value;
+
+            // Filtrer les projets selon la sélection
+            const filteredProjects = projects.filter(proj => 
+                (selectedClimate === "all" || proj.climate === selectedClimate) &&
+                (selectedMaterial === "all" || proj.material === selectedMaterial)
+            );
+
+            // Supprimer les anciens marqueurs sur la carte
+            document.querySelectorAll(".mapboxgl-marker").forEach(marker => marker.remove());
+
+            // Vider la liste des projets affichés
+            const projectList = document.getElementById("project-list");
+            projectList.innerHTML = "";
+
+            // Ajouter les nouveaux projets filtrés à la carte et au menu
+            filteredProjects.forEach(proj => {
+                // Ajouter un marqueur sur la carte
+                const marker = new mapboxgl.Marker()
+                    .setLngLat(proj.coords)
+                    .addTo(map);
+                
+                    // Gérer le clic sur le marqueur
+                    marker.getElement().addEventListener('click', () => {
+                        document.getElementById("popup-iframe").src = projectList.url; // Charge la page du projet
+                        document.getElementById("popup-container").style.display = "flex"; // Affiche la popup
+                    });
+
+            // Fermer la popup quand on clique sur le bouton "×"
+            document.getElementById("close-popup").addEventListener("click", () => {
+                document.getElementById("popup-container").style.display = "none"; // Cache la popup
+                document.getElementById("popup-iframe").src = ""; // Vide l'iframe
+            });
+
+
+                // Ajouter le projet dans le menu
+                const projectItem = document.createElement("div");
+                projectItem.className = "project-item";
+                projectItem.innerHTML = `<strong>${proj.name}</strong>`;
+    
+                // Ajouter un événement au clic pour centrer la carte sur le projet
+                projectItem.addEventListener("click", () => {
+                    map.flyTo({ center: proj.coords, zoom: 7 });
+                });
+
+                projectList.appendChild(projectItem);
+            });
+        }
+
+        // Ajouter les événements pour mettre à jour les projets affichés
+        document.getElementById("climateFilter").addEventListener("change", updateProjects);
+        document.getElementById("materialFilter").addEventListener("change", updateProjects);
+
+        // Afficher tous les projets au chargement
+        updateProjects();
+
+        document.getElementById('climate-filter').addEventListener('change', function (e) {
+            const selectedClimate = e.target.value;
+
+            if (selectedClimate === "all") {
+                // Afficher toutes les zones
+                map.setLayoutProperty('climate-zones', 'visibility', 'visible');
+                map.setLayoutProperty('climate-borders', 'visibility', 'visible');
+                map.setFilter('climate-zones', null);
+                map.setFilter('climate-borders', null);
+            } else if (selectedClimate === "all") {
+                // Cacher toutes les zones
+                map.setLayoutProperty('climate-zones', 'visibility', 'none');
+                map.setLayoutProperty('climate-borders', 'visibility', 'none');
+            } else {
+                // Afficher seulement la zone sélectionnée
+                map.setLayoutProperty('climate-zones', 'visibility', 'visible');
+                map.setLayoutProperty('climate-borders', 'visibility', 'visible');
+                map.setFilter('climate-zones', ['==', ['get', 'climate'], selectedClimate]);
+                map.setFilter('climate-borders', ['==', ['get', 'climate'], selectedClimate]);
+            }
+        });
+    </script>
+
+</body>
+</html>
