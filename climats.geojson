@@ -19,7 +19,7 @@
       },
       {
         "type": "Feature",
-        "properties": { "climate": "Tempéré" },
+        "properties": { "climate": "Tempere" },
         "geometry": {
           "type": "Polygon",
           "coordinates": [[[ -100, 30 ], [ 150, 30 ], [ 150, 50 ], [ -100, 50 ], [ -100, 30 ]]]
