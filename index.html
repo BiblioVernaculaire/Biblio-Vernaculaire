@@ -202,12 +202,6 @@
             const selectedClimate = e.target.value;
 
             if (selectedClimate === "all") {
-                // Afficher toutes les zones
-                map.setLayoutProperty('climate-zones', 'visibility', 'visible');
-                map.setLayoutProperty('climate-borders', 'visibility', 'visible');
-                map.setFilter('climate-zones', null);
-                map.setFilter('climate-borders', null);
-            } else if (selectedClimate === "all") {
                 // Cacher toutes les zones
                 map.setLayoutProperty('climate-zones', 'visibility', 'none');
                 map.setLayoutProperty('climate-borders', 'visibility', 'none');
