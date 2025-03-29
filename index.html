@@ -182,6 +182,9 @@
             const selectedClimate = document.getElementById("climateFilter").value;
             const selectedMaterial = document.getElementById("materialFilter").value;
 
+            console.log("🔍 Projets avant filtrage :", projects);
+            console.log("🌿 Filtre sélectionné :", selectedClimate, selectedMaterial);
+
             // Filtrer les projets selon la sélection
             const filteredProjects = projects.filter(proj => 
                 (selectedClimate === "all" || proj.climate === selectedClimate) &&
