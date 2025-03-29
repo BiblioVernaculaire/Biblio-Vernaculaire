@@ -167,12 +167,10 @@
                     }));
 
                     // Afficher les projets
-                    document.getElementById("output").textContent = JSON.stringify(projects, null, 2);
                     console.log("Projects:", projects);
                 })
                 .catch(error => {
                     console.error("Erreur lors du chargement du fichier Excel :", error);
-                    document.getElementById("output").textContent = "Erreur de chargement.";
                 });
         }
 
