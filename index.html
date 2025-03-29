@@ -135,7 +135,8 @@
             });
         });
 
-        let projects = []; // ✅ Déclaration globale
+
+        let projects = [];  // ✅ Déclaration globale
 
         function loadExcelFromUrl(url) {
             fetch(url)
@@ -173,8 +174,6 @@
                 });
         }
 
-        // 📂 Remplace "chemin/vers/projets.xlsx" par le vrai chemin de ton fichier Excel sur le serveur
-        loadExcelFromUrl("projets.xlsx");
 
         // Fonction pour afficher les projets filtrés
         function updateProjects() {
@@ -249,8 +248,11 @@
         document.getElementById("climateFilter").addEventListener("change", updateProjects);
         document.getElementById("materialFilter").addEventListener("change", updateProjects);
 
-        // Afficher tous les projets au chargement
-        updateProjects();
+
+        loadExcelFromUrl("projets.xlsx").then(() => {
+            console.log("✅ Fichier chargé, mise à jour des projets !");
+            updateProjects(); // 🔥 Met à jour après le chargement
+        });
     </script>
 
 </body>
