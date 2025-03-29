@@ -177,14 +177,6 @@
         // 📂 Remplace "chemin/vers/projets.xlsx" par le vrai chemin de ton fichier Excel sur le serveur
         loadExcelFromUrl("projets.xlsx");
 
-
-        // Liste des projets
-        const projects = [
-            { name: "Piichi/Miichi et Lu'uma", coords: [-71.7164, 12.0725], url: "projet1.html", climate: "tempere", material: "bois"},
-            { name: "Londres", coords: [-0.1278, 51.5074], url: "projet2.html", climate: "aride", material: "terre"},
-            { name: "Berlin", coords: [13.405, 52.52], url: "projet3.html", climate: "aride", material: "bois"}
-        ];
-
         // Fonction pour afficher les projets filtrés
         function updateProjects() {
             const selectedClimate = document.getElementById("climateFilter").value;
