@@ -136,46 +136,7 @@
         });
 
 
-        let projects = [];  // ✅ Déclaration globale
-
-        function loadExcelFromUrl(url) {
-            fetch(url)
-                .then(response => response.arrayBuffer())  // Convertir en format binaire
-                .then(data => {
-                    const workbook = XLSX.read(data, { type: "array" });  // Lire le fichier Excel
-
-                    const sheetName = workbook.SheetNames[0];  // Prendre la première feuille
-                    const sheet = workbook.Sheets[sheetName];
-
-                    const jsonData = XLSX.utils.sheet_to_json(sheet); // Convertir en JSON
-
-                    // Transformer les données en objets formatés
-                    projects = jsonData.map(row => ({
-                        name: row.name,
-                        coords: [parseFloat(row.longitude), parseFloat(row.latitude)],
-                        url: row.url,
-                        climate: row.climate,
-                        material: row.material,
-                        country: row.pays,
-                        photoProjet: row.photoProjet,
-                        desc: row.description,
-                        biocli: row.bioclimatique,
-                        ensoleillement: row.ensoleillement,
-                        eleve: row.eleve,
-                        insta: row.insta,
-                        climat2: row.climat2
-                    }));
-
-                    // Afficher les projets
-                    console.log("Projects:", projects);
-                })
-                .catch(error => {
-                    console.error("Erreur lors du chargement du fichier Excel :", error);
-                });
-        }
-
-        // 📂 Remplace "chemin/vers/projets.xlsx" par le vrai chemin de ton fichier Excel sur le serveur
-        loadExcelFromUrl("projets.xlsx");
+        
 
         // Fonction pour afficher les projets filtrés
         function updateProjects() {
@@ -253,8 +214,50 @@
         document.getElementById("climateFilter").addEventListener("change", updateProjects);
         document.getElementById("materialFilter").addEventListener("change", updateProjects);
 
-        // Afficher tous les projets au chargement
-        updateProjects();
+        let projects = [];  // ✅ Déclaration globale
+
+        function loadExcelFromUrl(url) {
+            fetch(url)
+                .then(response => response.arrayBuffer())  // Convertir en format binaire
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });  // Lire le fichier Excel
+
+                    const sheetName = workbook.SheetNames[0];  // Prendre la première feuille
+                    const sheet = workbook.Sheets[sheetName];
+
+                    const jsonData = XLSX.utils.sheet_to_json(sheet); // Convertir en JSON
+
+                    // Transformer les données en objets formatés
+                    projects = jsonData.map(row => ({
+                        name: row.name,
+                        coords: [parseFloat(row.longitude), parseFloat(row.latitude)],
+                        url: row.url,
+                        climate: row.climate,
+                        material: row.material,
+                        country: row.pays,
+                        photoProjet: row.photoProjet,
+                        desc: row.description,
+                        biocli: row.bioclimatique,
+                        ensoleillement: row.ensoleillement,
+                        eleve: row.eleve,
+                        insta: row.insta,
+                        climat2: row.climat2
+                    }));
+
+                    // Afficher les projets
+                    console.log("Projects:", projects);
+
+                    // Afficher tous les projets au chargement
+                    updateProjects();
+                })
+                .catch(error => {
+                    console.error("Erreur lors du chargement du fichier Excel :", error);
+                });
+        }
+
+        // 📂 Remplace "chemin/vers/projets.xlsx" par le vrai chemin de ton fichier Excel sur le serveur
+        loadExcelFromUrl("projets.xlsx");
+        
     </script>
 
 </body>
