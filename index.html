@@ -7,6 +7,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
     <link rel="stylesheet" href="main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -134,6 +135,51 @@
             });
         });
 
+
+
+
+        function loadExcelFromUrl(url) {
+            fetch(url)
+                .then(response => response.arrayBuffer())  // Convertir en format binaire
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });  // Lire le fichier Excel
+
+                    const sheetName = workbook.SheetNames[0];  // Prendre la première feuille
+                    const sheet = workbook.Sheets[sheetName];
+
+                    const jsonData = XLSX.utils.sheet_to_json(sheet); // Convertir en JSON
+
+                    // Transformer les données en objets formatés
+                    const projects = jsonData.map(row => ({
+                        name: row.name,
+                        coords: [parseFloat(row.longitude), parseFloat(row.latitude)],
+                        url: row.url,
+                        climate: row.climate,
+                        material: row.material,
+                        country: row.pays,
+                        photoProjet: row.photoProjet,
+                        desc: row.description,
+                        biocli: row.bioclimatique,
+                        ensoleillement: row.ensoleillement,
+                        eleve: row.eleve,
+                        insta: row.insta,
+                        climat2: row.climat2
+                    }));
+
+                    // Afficher les projets
+                    document.getElementById("output").textContent = JSON.stringify(projects, null, 2);
+                    console.log("Projects:", projects);
+                })
+                .catch(error => {
+                    console.error("Erreur lors du chargement du fichier Excel :", error);
+                    document.getElementById("output").textContent = "Erreur de chargement.";
+                });
+        }
+
+        // 📂 Remplace "chemin/vers/projets.xlsx" par le vrai chemin de ton fichier Excel sur le serveur
+        loadExcelFromUrl("projets.xlsx");
+
+
         // Liste des projets
         const projects = [
             { name: "Piichi/Miichi et Lu'uma", coords: [-71.7164, 12.0725], url: "projet1.html", climate: "tempere", material: "bois"},
@@ -198,16 +244,17 @@
                 map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
             });
             } else {
-                // Cache toutes les couches
-                Object.values(climateGroups).flat().forEach(code => {
-                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
+            // Cache toutes les couches
+            Object.values(climateGroups).flat().forEach(code => {
+                map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
+            });
+            // Affiche uniquement la couche du climat sélectionné
+            if (climateGroups[selectedClimate]) { 
+                climateGroups[selectedClimate].forEach(code => {
+                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'visible');      
                 });
-                // Affiche uniquement la couche du climat sélectionné
-                if (climateGroups[selectedClimate]) { 
-                    climateGroups[selectedClimate].forEach(code => {
-                        map.setLayoutProperty(`climate-${code}`, 'visibility', 'visible');      
-                    });  
-                }}}
+            }
+            }}
 
         // Ajouter les événements pour mettre à jour les projets affichés
         document.getElementById("climateFilter").addEventListener("change", updateProjects);
