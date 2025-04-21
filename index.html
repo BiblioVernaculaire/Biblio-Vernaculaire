@@ -55,6 +55,7 @@
                 <h2 id="popup-title"></h2>
                 <p id="coordCountry"></p>
                 <img id="popup-image" src="" alt="" />
+                <p id="credit1"></p>
                 <p id="popup-description"></p>
                 
 
@@ -132,7 +133,7 @@
                         source: 'climates',
                         paint: {
                             'fill-color': {
-                                polaire: '##123dff',
+                                polaire: '#123dff',
                                 tropical: '#5c965e',
                                 aride: '#deba14',
                                 tempere: '#c96767',
@@ -182,9 +183,10 @@
                     // Gérer le clic sur le marqueur
                     marker.getElement().addEventListener('click', () => {
                         document.getElementById("popup-title").innerText = proj.name;
-                        document.getElementById("coordCountry").innerText = proj.coords + country;
+                        document.getElementById("coordCountry").innerText = proj.coords + proj.country;
                         document.getElementById("popup-image").src = proj.photoProjet;
                         document.getElementById("popup-image").alt = proj.name;
+                        document.getElementById("credit1").innerText = 
                         document.getElementById("popup-description").innerText = proj.desc;
                         document.getElementById("urlInsta").href = insta;
                         
@@ -254,6 +256,7 @@
                         material: row.material,
                         country: row.pays,
                         photoProjet: row.photoProjet,
+                        creditPhotoProjet: row.creditPhotoProjet,
                         desc: row.description,
                         biocli: row.bioclimatique,
                         ensoleillement: row.ensoleillement,
