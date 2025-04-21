@@ -48,9 +48,18 @@
         <div id="popup-content">
             <span id="close-popup">&times;</span>
             <div id="popup-details">
+
+
+
+
                 <h2 id="popup-title"></h2>
+                <p id="coordCountry"></p>
                 <img id="popup-image" src="" alt="" />
                 <p id="popup-description"></p>
+                
+
+                <a id="urlinsta">Instagram publication</a>
+
             </div>
         </div>
     </div>
@@ -123,7 +132,7 @@
                         source: 'climates',
                         paint: {
                             'fill-color': {
-                                polaire: '#9ddbda',
+                                polaire: '##123dff',
                                 tropical: '#5c965e',
                                 aride: '#deba14',
                                 tempere: '#c96767',
@@ -173,9 +182,11 @@
                     // Gérer le clic sur le marqueur
                     marker.getElement().addEventListener('click', () => {
                         document.getElementById("popup-title").innerText = proj.name;
+                        document.getElementById("coordCountry").innerText = proj.coords + country;
                         document.getElementById("popup-image").src = proj.photoProjet;
                         document.getElementById("popup-image").alt = proj.name;
                         document.getElementById("popup-description").innerText = proj.desc;
+                        document.getElementById("urlInsta").href = insta;
                         
                         document.getElementById("popup-container").style.display = "flex"; // Affiche la popup
                     });
