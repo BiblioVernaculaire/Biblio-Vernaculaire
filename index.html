@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblio Vernaculaire</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <!-- MENU LATÉRAL -->
+    <div id="menu">
+        <h1>Bibliothèque Vernaculaire</h1>
+        <p>Explorez les projets architecturaux traditionnels à travers le monde.</p>
+        <div id="filters">
+            <label for="climateFilter">Climat :</label>
+            <select id="climateFilter">
+                <option value="all">Tous</option>
+                <option value="tropical">Tropical</option>
+                <option value="aride">Aride</option>
+                <option value="tempere">Tempéré</option>
+                <option value="continental">Continental</option>
+                <option value="polaire">Polaire</option>
+            </select>
+        
+            <label for="materialFilter">Matériau :</label>
+            <select id="materialFilter">
+                <option value="all">Tous</option>
+                <option value="bois">Bois</option>
+                <option value="pierre">Pierre</option>
+                <option value="terre">Terre</option>
+                <option value="brique">Brique</option>
+                <option value="metal">Métal</option>
+            </select>
+        </div>
+        <h2>Projets :</h2>
+        <div id="project-list"></div>
+    </div>
+
+    <!-- CARTE -->
+    <div id="map"></div>
+
+    <!-- Popup projet -->
+    <div id="popup-container">
+        <div id="popup-content">
+            <span id="close-popup">&times;</span>
+            <div id="popup-details">
+                <h2 id="popup-title"></h2>
+                <img id="popup-image" src="" alt="" />
+                <p id="popup-description"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYmlibGlvdmVybmFjdWxhaXJlIiwiYSI6ImNtODNiaDc2MDA0NGIyb3I0cTd4bXdmN3IifQ.ZMJRLLBtSc6pEhXXSvrMQA';
+
+        // Liste élargie de centres sur chaque continent
+        const continentCenters = [
+            // 🌍 Afrique
+            [23, -1], [10, 20], [30, -10], [0, 5], [35, 15],
+
+            // 🌎 Amérique du Nord
+            [-100, 40], [-80, 25], [-120, 50], [-90, 60], [-110, 35],
+
+            // 🌎 Amérique du Sud
+            [-60, -15], [-70, -30], [-55, 0], [-80, -10], [-50, -20],
+
+            // 🌏 Asie
+            [100, 35], [80, 50], [120, 20], [90, 10], [110, 40],
+
+            // 🌍 Europe
+            [10, 50], [-5, 45], [20, 55], [30, 60], [0, 65],
+
+            // 🌏 Océanie
+            [135, -25], [150, -30], [140, -20], [130, -15], [160, -35]
+        ];
+
+        // Sélectionner un point aléatoire dans la liste
+        const randomCenter = continentCenters[Math.floor(Math.random() * continentCenters.length)];
+
+        // Ajouter une variation aléatoire autour du point sélectionné
+        const variationLng = (Math.random() - 0.5) * 20; // Décalage longitude (-5 à +5)
+        const variationLat = (Math.random() - 0.5) * 15;  // Décalage latitude (-2.5 à +2.5)
+
+        const finalCenter = [
+            randomCenter[0] + variationLng, 
+            randomCenter[1] + variationLat
+        ];
+
+        // Initialisation de la carte
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/bibliovernaculaire/cm83bsejw000h01sefj93d1u7', // Ton style Mapbox
+            center: finalCenter, // Coordonnées initiales
+            zoom: 2
+        });
+
+        const climateGroups = {
+            polaire: ['ET', 'EF'],
+            tropical: ['Af', 'Am', 'Aw', 'As'],
+            aride: ['BWh', ' BWk', 'BSh', 'BSk'],
+            tempere: ['Cfa', 'Cfb', 'Cfc', 'Csa', 'Csb', 'Csc', 'Cwa', 'Cwb', 'Cwc'],
+            continental: ['Dfa', 'Dfb', 'Dfc', 'Dfd', 'Dsa', 'Dsb', 'Dsc', 'Dsd', 'Dwa', 'Dwb', 'Dwc', 'Dwd']
+        };
+
+        // Charge le GeoJSON
+        map.on('load', function() {
+            // Charge ton GeoJSON avec les zones climatiques
+            map.addSource('climates', {
+                type: 'geojson',
+                data: '1976-2000.geojson'
+            });
+
+            Object.entries(climateGroups).forEach(([climate, codes]) => {
+                codes.forEach(code => {  // 🔥 On crée une couche pour chaque code de climat
+                    map.addLayer({
+                        id: `climate-${code}`,  // ✅ L'ID est basé sur le code de climat (ET, EF...)
+                        type: 'fill',
+                        source: 'climates',
+                        paint: {
+                            'fill-color': {
+                                polaire: '#9ddbda',
+                                tropical: '#5c965e',
+                                aride: '#deba14',
+                                tempere: '#c96767',
+                                continental: '#8d5c96'
+                            }[climate], // 🎨 Associe la bonne couleur
+                            'fill-opacity': 0.5
+                        },
+                        filter: ['==', ['get', 'CODE'], code]  // 🔥 Filtre sur chaque code spécifique
+                    });
+
+                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'none'); // Masquer par défaut
+                });
+            });
+        });
+
+
+        
+
+        // Fonction pour afficher les projets filtrés
+        function updateProjects() {
+            const selectedClimate = document.getElementById("climateFilter").value;
+            const selectedMaterial = document.getElementById("materialFilter").value;
+
+            console.log("🔍 Projets avant filtrage :", projects);
+            console.log("🌿 Filtre sélectionné :", selectedClimate, selectedMaterial);
+
+            // Filtrer les projets selon la sélection
+            const filteredProjects = projects.filter(proj => 
+                (selectedClimate === "all" || proj.climate === selectedClimate) &&
+                (selectedMaterial === "all" || proj.material === selectedMaterial)
+            );
+
+            // Supprimer les anciens marqueurs sur la carte
+            document.querySelectorAll(".mapboxgl-marker").forEach(marker => marker.remove());
+
+            // Vider la liste des projets affichés
+            const projectList = document.getElementById("project-list");
+            projectList.innerHTML = "";
+
+            // Ajouter les nouveaux projets filtrés à la carte et au menu
+            filteredProjects.forEach(proj => {
+                // Ajouter un marqueur sur la carte
+                const marker = new mapboxgl.Marker()
+                    .setLngLat(proj.coords)
+                    .addTo(map);
+                
+                    // Gérer le clic sur le marqueur
+                    marker.getElement().addEventListener('click', () => {
+                        document.getElementById("popup-title").innerText = proj.name;
+                        document.getElementById("popup-image").src = proj.photoProjet;
+                        document.getElementById("popup-image").alt = proj.name;
+                        document.getElementById("popup-description").innerText = proj.desc;
+                        
+                        document.getElementById("popup-container").style.display = "flex"; // Affiche la popup
+                    });
+
+            // Fermer la popup quand on clique sur le bouton "×"
+            document.getElementById("close-popup").addEventListener("click", () => {
+                document.getElementById("popup-container").style.display = "none"; // Cache la popup
+            });
+
+                // Ajouter le projet dans le menu
+                const projectItem = document.createElement("div");
+                projectItem.className = "project-item";
+                projectItem.innerHTML = `<strong>${proj.name}</strong>`;
+    
+                // Ajouter un événement au clic pour centrer la carte sur le projet
+                projectItem.addEventListener("click", () => {
+                    map.flyTo({ center: proj.coords, zoom: 7 });
+                });
+
+                projectList.appendChild(projectItem);
+            });
+            
+            // Si "all" est sélectionné, on cache toutes les couches
+            if (selectedClimate === "all") {
+            // Cache toutes les couches
+            Object.values(climateGroups).flat().forEach(code => {
+                map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
+            });
+            } else {
+            // Cache toutes les couches
+            Object.values(climateGroups).flat().forEach(code => {
+                map.setLayoutProperty(`climate-${code}`, 'visibility', 'none');
+            });
+            // Affiche uniquement la couche du climat sélectionné
+            if (climateGroups[selectedClimate]) { 
+                climateGroups[selectedClimate].forEach(code => {
+                    map.setLayoutProperty(`climate-${code}`, 'visibility', 'visible');      
+                });
+            }
+            }}
+
+        // Ajouter les événements pour mettre à jour les projets affichés
+        document.getElementById("climateFilter").addEventListener("change", updateProjects);
+        document.getElementById("materialFilter").addEventListener("change", updateProjects);
+
+        let projects = [];  // ✅ Déclaration globale
+
+        function loadExcelFromUrl(url) {
+            fetch(url)
+                .then(response => response.arrayBuffer())  // Convertir en format binaire
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: "array" });  // Lire le fichier Excel
+
+                    const sheetName = workbook.SheetNames[0];  // Prendre la première feuille
+                    const sheet = workbook.Sheets[sheetName];
+
+                    const jsonData = XLSX.utils.sheet_to_json(sheet); // Convertir en JSON
+
+                    // Transformer les données en objets formatés
+                    projects = jsonData.map(row => ({
+                        name: row.name,
+                        coords: [parseFloat(row.longitude), parseFloat(row.latitude)],
+                        url: row.url,
+                        climate: row.climate,
+                        material: row.material,
+                        country: row.pays,
+                        photoProjet: row.photoProjet,
+                        desc: row.description,
+                        biocli: row.bioclimatique,
+                        ensoleillement: row.ensoleillement,
+                        eleve: row.eleve,
+                        insta: row.insta,
+                        climat2: row.climat2
+                    }));
+
+                    // Afficher les projets
+                    console.log("Projects:", projects);
+
+                    // Afficher tous les projets au chargement
+                    updateProjects();
+                })
+                .catch(error => {
+                    console.error("Erreur lors du chargement du fichier Excel :", error);
+                });
+        }
+
+        // 📂 Remplace "chemin/vers/projets.xlsx" par le vrai chemin de ton fichier Excel sur le serveur
+        loadExcelFromUrl("projets.xlsx");
+        
+    </script>
+
+</body>
+</html>
