@@ -24,8 +24,6 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; display: flex; }
     top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: none; /* Caché par défaut */
-    justify-content: center;
-    align-items: center;
 }
 
 /* Contenu de la popup */
@@ -48,10 +46,38 @@ body, html { margin: 0; padding: 0; width: 100%; height: 100%; display: flex; }
     cursor: pointer;
 }
 
-/* Iframe pour afficher la page */
-#popup-iframe {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    border: none;
+
+#popup-content::-webkit-scrollbar {
+    width: 8px;
+}
+#popup-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+#close-popup {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#popup-details img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px 0;
+}
+
+#urlinsta {
+    display: inline-block;
+    margin-top: 15px;
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#urlinsta:hover {
+    text-decoration: underline;
 }
