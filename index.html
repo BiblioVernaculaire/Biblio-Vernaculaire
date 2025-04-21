@@ -57,9 +57,13 @@
                 <img id="popup-image" src="" alt="" />
                 <p id="credit1"></p>
                 <p id="popup-description"></p>
-                
+                <img id="popup-bioclimatique" src="" alt="" />
+                <img id="popup-ensoleillement" src="" alt="" />
 
-                <a id="urlinsta" href="">Instagram publication</a>
+                <p id="travailEleve"></p>
+
+
+                <a id="urlinsta" href=""    >Instagram publication</a>
 
             </div>
         </div>
@@ -183,11 +187,19 @@
                     // Gérer le clic sur le marqueur
                     marker.getElement().addEventListener('click', () => {
                         document.getElementById("popup-title").innerText = proj.name;
-                        document.getElementById("coordCountry").innerText = proj.coords + proj.country;
+                        document.getElementById("coordCountry").innerText = proj.coords + " " + proj.country;
                         document.getElementById("popup-image").src = proj.photoProjet;
                         document.getElementById("popup-image").alt = proj.name;
-                        document.getElementById("credit1").innerText = 
+                        document.getElementById("credit1").innerText = proj.creditPhotoProjet,
                         document.getElementById("popup-description").innerText = proj.desc;
+                        document.getElementById("popup-bioclimatique").src = proj.biocli;
+                        document.getElementById("popup-bioclimatique").alt = "Coupe Bioclimatique" + proj.name;
+                        document.getElementById("popup-ensoleillement").src = proj.ensoleillement;
+                        document.getElementById("popup-ensoleillement").alt = "Ensoleillement" + proj.name;
+                        document.getElementById("travailEleve").innerText = proj.eleve,
+
+
+
                         document.getElementById("urlinsta").href = proj.insta;
                         
                         document.getElementById("popup-container").style.display = "flex"; // Affiche la popup
